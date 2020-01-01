@@ -26,10 +26,13 @@ def is_OnePair(PlayerHand: List[DataClassCard]):
     for iCar,NCards in enumerate(CountingList):
         if(NCards==2):
             count+=1;
+            PairRank = CardRanks[iCar]
+        else:
+            HighestRank = CardRanks[iCar]
     if(count==2):
-        return True
+        return [1,PairRank,HighestRank]
     else:
-        return False
+        return [0, 0, 0]
 
 
 def is_TwoPairs(PlayerHand: List[DataClassCard]):
@@ -49,13 +52,17 @@ def is_TwoPairs(PlayerHand: List[DataClassCard]):
                 CountingList[iCar]+=1
 
     count=0
+    PairRankValues = list()
     for iCar,NCards in enumerate(CountingList):
         if(NCards==2):
-            count+=1;
+            count+=1
+            PairRankValues.append(CardRanks[iCar])
+        else:
+            HighestRank = CardRanks[iCar]
     if(count==4):
-        return True
+        return [1,max(PairRankValues),min(PairRankValues),HighestRank]
     else:
-        return False
+        return [0, 0, 0, 0]
 
 
 def is_ThreeofaKind(PlayerHand: List[DataClassCard]):
@@ -78,10 +85,13 @@ def is_ThreeofaKind(PlayerHand: List[DataClassCard]):
     for iCar,NCards in enumerate(CountingList):
         if(NCards==3):
             count+=1;
+            TrioRank = CardRanks[iCar]
+        else:
+            HighestRank = CardRanks[iCar]
     if(count==3):
-        return True
+        return [1,TrioRank,HighestRank ]
     else:
-        return False
+        return [0,0,0]
 
 
 def is_Straight(PlayerHand: List[DataClassCard]):
@@ -95,7 +105,7 @@ def is_Straight(PlayerHand: List[DataClassCard]):
     CardRanks.sort()
     SumConsequtive = 0
     for iCard,Card in enumerate(CardRanks):
-        if iCard<4 and Card==CardRanks[iCard+1]+1 :
+        if iCard<4 and Card==CardRanks[iCard+1]-1 :
             SumConsequtive +=1
             if Card == 14 and CardRanks[iCard-1]==5 and CardRanks.__eq__([2,3,4,5,14]):
                 return True
@@ -118,7 +128,7 @@ def is_StraightFlush(PlayerHand: List[DataClassCard]):
         CardRanks.sort()
         SumConsequtive = 0
         for iCard, Card in enumerate(CardRanks):
-            if iCard<4 and Card==CardRanks[iCard+1]+1:
+            if iCard<4 and Card==CardRanks[iCard+1]-1:
                 SumConsequtive +=1
             if Card == 14 and CardRanks[iCard-1]==5 and CardRanks.__eq__([2,3,4,5,14]):
                 return True
@@ -136,11 +146,11 @@ def is_FourKind(PlayerHand: List[DataClassCard]):
     CardRanks = list(map(int, CardRanks))
     CardRanks.sort()
     if CardRanks[0] == CardRanks[1] and CardRanks[1] == CardRanks[2] and CardRanks[2] == CardRanks[3]:
-        return True
+        return [1, CardRanks[0]]
     elif CardRanks[1] == CardRanks[2] and CardRanks[2] == CardRanks[3] and CardRanks[3] == CardRanks[4]:
-        return True
+        return [1, CardRanks[1]]
     else:
-        return False
+        return [0, 0]
 
 def is_FullHouse(PlayerHand: List[DataClassCard]):
     CardRanks = [PlayerHand[0].rank, PlayerHand[1].rank, PlayerHand[2].rank, PlayerHand[3].rank, PlayerHand[4].rank]
@@ -152,11 +162,11 @@ def is_FullHouse(PlayerHand: List[DataClassCard]):
     CardRanks = list(map(int, CardRanks))
     CardRanks.sort()
     if CardRanks[0] == CardRanks[1] and CardRanks[1] == CardRanks[2] and CardRanks[3] == CardRanks[4]:
-        return True
+        return [1, CardRanks[0], CardRanks[4]]
     elif CardRanks[0] == CardRanks[1] and CardRanks[2] == CardRanks[3] and CardRanks[3] == CardRanks[4]:
-        return True
+        return [1, CardRanks[4], CardRanks[0]]
     else:
-        return False
+        return [0, 0, 0]
 
 
 def is_Flush(PlayerHand: List[DataClassCard]):
@@ -190,6 +200,22 @@ def is_RoyalFlush(PlayerHand: List[DataClassCard]):
     else:
         return False
 
+def HighestCard(Hand1, Hand2):
+    iCard = 4
+    if( Hand1[iCard]>Hand2[iCard]):
+        return 1
+
+    while (Hand1[iCard]==Hand2[iCard] and iCard>0):
+        iCard-=1
+        if(Hand1[iCard]>Hand2[iCard]):
+            return 1
+    return 0
+    #for iCard, Card in enumerate(Hand1):
+    #    if(Hand1[4-iCard]>Hand2[4-iCard]):
+    #        count+=1
+    #        break
+    #    elif(Hand1[4-iCard]<Hand2[4-iCard]):
+    #        break
 
 f = open("p054_poker.txt", "r")
 
@@ -230,19 +256,19 @@ for line in f:
         Hand1Score=9
     elif(is_StraightFlush(Player1Hand)):
         Hand1Score=8
-    elif(is_FourKind(Player1Hand)):
+    elif(is_FourKind(Player1Hand)[0]):
         Hand1Score=7
-    elif(is_FullHouse(Player1Hand)):
+    elif(is_FullHouse(Player1Hand)[0]):
         Hand1Score=6
     elif(is_Flush(Player1Hand)):
         Hand1Score=5
     elif(is_Straight(Player1Hand)):
         Hand1Score=4
-    elif(is_ThreeofaKind(Player1Hand)):
+    elif(is_ThreeofaKind(Player1Hand)[0]):
         Hand1Score=3
-    elif(is_TwoPairs(Player1Hand)):
+    elif(is_TwoPairs(Player1Hand)[0]):
         Hand1Score=2
-    elif(is_OnePair(Player1Hand)):
+    elif(is_OnePair(Player1Hand)[0]):
         Hand1Score=1
     else:
         Hand1Score = 0
@@ -251,19 +277,19 @@ for line in f:
         Hand2Score=9
     elif(is_StraightFlush(Player2Hand)):
         Hand2Score=8
-    elif(is_FourKind(Player2Hand)):
+    elif(is_FourKind(Player2Hand)[0]):
         Hand2Score=7
-    elif(is_FullHouse(Player2Hand)):
+    elif(is_FullHouse(Player2Hand)[0]):
         Hand2Score=6
     elif(is_Flush(Player2Hand)):
         Hand2Score=5
     elif(is_Straight(Player2Hand)):
         Hand2Score=4
-    elif(is_ThreeofaKind(Player2Hand)):
+    elif(is_ThreeofaKind(Player2Hand)[0]):
         Hand2Score=3
-    elif(is_TwoPairs(Player2Hand)):
+    elif(is_TwoPairs(Player2Hand)[0]):
         Hand2Score=2
-    elif(is_OnePair(Player2Hand)):
+    elif(is_OnePair(Player2Hand)[0]):
         Hand2Score=1
     else:
         Hand2Score = 0
@@ -305,17 +331,56 @@ for line in f:
         # is_OnePair()#1
 
         if(Hand1Score==0):
-            iCard=0
-            for iCard, Card in enumerate(Card1Ranks):
-                if(Card1Ranks[4-iCard]>Card2Ranks[4-iCard]):
-                    count+=1
-                    break
-                elif(Card1Ranks[4-iCard]<Card2Ranks[4-iCard]):
-                    break
-        elif(Hand1Score==1):
-            iCard = 33
+            #Highest card
+            count = count + HighestCard(Card1Ranks, Card2Ranks)
+        elif(Hand1Score==1): #Pair
+            [isPair,PairRank1,HighestRank1] = is_OnePair(Player1Hand)
+            [isPair, PairRank2, HighestRank2] = is_OnePair(Player2Hand)
+            if(PairRank1>PairRank2):
+                count+=1
+            elif(PairRank1==PairRank2):
+                count = count + HighestCard(Card1Ranks, Card2Ranks)
+        elif (Hand1Score == 2):  # Two pairs
+            [isTP, max_PairRankValues1, min_PairRankValues1, HighestRank] = is_TwoPairs(Player1Hand)
+            [isTP, max_PairRankValues2, min_PairRankValues2, HighestRank] = is_TwoPairs(Player1Hand)
+            if(max_PairRankValues1>max_PairRankValues2):
+                count += 1
+            elif(max_PairRankValues1==max_PairRankValues2):
+                if(min_PairRankValues1>min_PairRankValues2):
+                    count += 1
+                elif(min_PairRankValues1==min_PairRankValues2):
+                    count = count + HighestCard(Card1Ranks, Card2Ranks)
+        elif (Hand1Score == 3): #Trio
+            [isTrio, TrioRank1, HighestRank] = is_ThreeofaKind(Player1Hand)
+            [isTrio, TrioRank2, HighestRank] = is_ThreeofaKind(Player2Hand)
+            if(TrioRank1>TrioRank2):
+                count+=1
+            elif(TrioRank1==TrioRank2): #Impossible to have 2 threes of a kind. This code is not needed
+                count = count + HighestCard(Card1Ranks, Card2Ranks)
 
+        elif (Hand1Score == 4): #Straight
+            count = count + HighestCard(Card1Ranks, Card2Ranks)
+        elif (Hand1Score == 5): #Flush
+            count = count + HighestCard(Card1Ranks, Card2Ranks)
+        elif (Hand1Score == 6): #Full House
+            [isFH, TrioRank1, PairRank1] = is_FullHouse(Player1Hand)
+            [isFH, TrioRank2, PairRank2] = is_FullHouse(Player1Hand)
+            if(TrioRank1>TrioRank2):
+                count += 1
+            elif(TrioRank1==TrioRank2): #Impossible to have 2 threes of a kind. This code is not needed
+                if(PairRank1>PairRank2):
+                    count += 1
+                elif(PairRank1==PairRank2):
+                    count = count + HighestCard(Card1Ranks, Card2Ranks)
+        elif (Hand1Score == 7): #Four kind
+            [isFK, FourRanks1] = is_FourKind(Player1Hand)
+            [isFK, FourRanks2] = is_FourKind(Player2Hand)
+            if(FourRanks1>FourRanks2):
+                count+=1
+        elif (Hand1Score == 8): #Straight Flush
+            count = count + HighestCard(Card1Ranks, Card2Ranks)
+        elif (Hand1Score == 0): #Royal Flush. They split the pot
+            count += 0
 
-print(countdraws)
 print(count)
 
