@@ -1,0 +1,12 @@
+#import numpy as np
+sum = 0.0
+for iNum in range(1000):
+    Division1 = iNum/3
+    Division2 = iNum/5
+    if Division1.is_integer() or Division2.is_integer():
+        sum = sum + iNum
+    if iNum==999:
+        print(iNum)
+
+
+print(sum)
